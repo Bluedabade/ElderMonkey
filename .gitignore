@@ -26,3 +26,9 @@ Thumbs.db
 # Editor settings
 .idea/
 .vscode/
+
+# Local AI agent instructions
+.codex/
+AGENTS.md
+CODEX.md
+.github/copilot-instructions.md
