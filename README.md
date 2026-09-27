@@ -10,7 +10,7 @@
 
 - หน้าแรกและรายการบริการ แยกตามหมวดหมู่พร้อมค้นหา
 - คู่มือ Facebook, Grab, LINE MAN, เป๋าตัง, สุขภาพ และความปลอดภัยออนไลน์
-- Tutorial แสดงครั้งละหนึ่งขั้น พร้อม progress และ Browser SpeechSynthesis ภาษาไทย
+- Tutorial แสดงครั้งละหนึ่งขั้น พร้อม progress, Browser SpeechSynthesis ภาษาไทย และหน้าสรุปเมื่อเรียนครบ
 - รายการโปรดและการตั้งค่าขนาดตัวอักษร/สีตัดกัน เก็บด้วย LocalStorage
 - เบอร์ฉุกเฉินแบบแตะเพื่อโทร
 - Mobile bottom navigation และ responsive layout
@@ -54,3 +54,9 @@ Simple, Clear, Familiar, Forgiving: ทุกหน้าระบุหัว�
 ใช้ semantic HTML, visible focus, skip link, heading hierarchy, touch target อย่างน้อย 48px, label คู่กับ icon, contrast ใกล้เคียง WCAG AA, keyboard navigation, `aria-live` ผ่าน status toast และรองรับ `prefers-reduced-motion`
 
 รายละเอียดเหตุผลอยู่ใน `DESIGN_DECISIONS.md`
+
+## เอกสารประกอบ Assignment
+
+- `AI_USAGE.md` อธิบายการใช้ AI และขอบเขตการตัดสินใจของผู้พัฒนา
+- `PRESENTATION_GUIDE.md` แนวทางนำเสนอและ Live Demo ภายใน 10 นาที
+- `ASSIGNMENT_MAPPING.md` เชื่อมคุณสมบัติของ ElderLink กับเกณฑ์การให้คะแนน

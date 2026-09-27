@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NavLink, Link, useLocation } from "react-router-dom";
 import {
   Home,
@@ -99,16 +99,56 @@ function NavItem({ to, icon: Icon, children }) {
   );
 }
 function SettingsPanel({ settings, setSettings, close }) {
+  const panelRef = useRef(null);
+  const previousFocusRef = useRef(null);
+
+  useEffect(() => {
+    previousFocusRef.current = document.activeElement;
+    const panel = panelRef.current;
+    panel?.querySelector("button")?.focus();
+    document.body.classList.add("dialog-open");
+
+    return () => {
+      document.body.classList.remove("dialog-open");
+      previousFocusRef.current?.focus();
+    };
+  }, []);
+
+  function handleKeyDown(event) {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      close();
+      return;
+    }
+    if (event.key !== "Tab") return;
+
+    const focusable = panelRef.current?.querySelectorAll(
+      'button:not([disabled]), input:not([disabled]), a[href]',
+    );
+    if (!focusable?.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
   return (
     <div
       className="overlay"
       onMouseDown={(e) => e.target === e.currentTarget && close()}
     >
       <section
+        ref={panelRef}
         className="settings-panel"
         role="dialog"
         aria-modal="true"
         aria-labelledby="settings-title"
+        onKeyDown={handleKeyDown}
       >
         <button
           className="close"
@@ -131,6 +171,7 @@ function SettingsPanel({ settings, setSettings, close }) {
                 key={v}
                 className={settings.font === v ? "selected" : ""}
                 onClick={() => setSettings({ ...settings, font: v })}
+                aria-pressed={settings.font === v}
               >
                 {l}
               </button>
@@ -210,12 +251,81 @@ export function GuideCard({
     </article>
   );
 }
+
+export function TutorialMedia({ step, accent, StepIcon, stepNumber }) {
+  const hasMedia = Boolean(step.image || step.video);
+
+  return (
+    <div
+      className={`step-visual${hasMedia ? " has-media" : ""}`}
+      style={{ "--accent": accent }}
+    >
+      {step.video ? (
+        <figure className="tutorial-step-figure">
+          <video
+            className="tutorial-step-video"
+            controls
+            playsInline
+            preload="metadata"
+            poster={step.videoPoster}
+            aria-label={step.videoCaption || `วิดีโอประกอบ ${step.title}`}
+          >
+            <source src={step.video} type="video/mp4" />
+            เบราว์เซอร์นี้ไม่สามารถเปิดวิดีโอได้ กรุณาอ่านคำอธิบายด้านล่าง
+          </video>
+          {step.videoCaption && (
+            <figcaption className="tutorial-step-caption">
+              {step.videoCaption}
+            </figcaption>
+          )}
+        </figure>
+      ) : step.image ? (
+        <figure className="tutorial-step-figure">
+          <a
+            className="tutorial-step-image-link"
+            href={step.image}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`เปิดภาพขนาดใหญ่: ${step.imageAlt}`}
+          >
+            <img
+              className="tutorial-step-image"
+              src={step.image}
+              alt={step.imageAlt}
+              loading="eager"
+              decoding="async"
+            />
+          </a>
+          {step.imageCaption && (
+            <figcaption className="tutorial-step-caption">
+              {step.imageCaption} · แตะภาพเพื่อดูขนาดใหญ่
+            </figcaption>
+          )}
+        </figure>
+      ) : (
+        <div className="mock-phone">
+          <span>{stepNumber}</span>
+          <StepIcon />
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function SpeechButton({ text }) {
   const [reading, setReading] = useState(false);
-  useEffect(() => () => speechSynthesis?.cancel(), []);
+  const synthesis = window.speechSynthesis;
+  const supported = Boolean(synthesis && window.SpeechSynthesisUtterance);
+  useEffect(
+    () => () => {
+      synthesis?.cancel();
+    },
+    [synthesis],
+  );
   function speak() {
+    if (!supported) return;
     if (reading) {
-      speechSynthesis.cancel();
+      synthesis.cancel();
       setReading(false);
       return;
     }
@@ -224,17 +334,24 @@ export function SpeechButton({ text }) {
     u.rate = 0.82;
     u.onend = () => setReading(false);
     u.onerror = () => setReading(false);
-    speechSynthesis.cancel();
-    speechSynthesis.speak(u);
+    synthesis.cancel();
+    synthesis.speak(u);
     setReading(true);
   }
   return (
     <button
       className={"btn speech " + (reading ? "speaking" : "")}
       onClick={speak}
+      disabled={!supported}
+      aria-pressed={reading}
+      aria-live="polite"
     >
       {reading ? <Square /> : <Volume2 />}
-      {reading ? "หยุดอ่าน" : "ฟังคำแนะนำ"}
+      {reading
+        ? "หยุดอ่าน"
+        : supported
+          ? "ฟังคำแนะนำ"
+          : "เบราว์เซอร์นี้ไม่รองรับเสียงอ่าน"}
     </button>
   );
 }

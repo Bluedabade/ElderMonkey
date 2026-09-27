@@ -1,5 +1,6 @@
 # Dependencies
 node_modules/
+.vite/
 
 # Production output
 dist/
@@ -7,6 +8,7 @@ dist/
 # Environment files and local overrides
 .env
 .env.*
+!.env.example
 *.local
 
 # Vercel local state

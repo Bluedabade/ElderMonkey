@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   ArrowLeft,
@@ -12,7 +12,12 @@ import {
   Volume2,
 } from "lucide-react";
 import { services, allGuides } from "./data/services";
-import { ServiceCard, GuideCard, SpeechButton } from "./components";
+import {
+  ServiceCard,
+  GuideCard,
+  SpeechButton,
+  TutorialMedia,
+} from "./components";
 export function Home() {
   return (
     <>
@@ -49,7 +54,7 @@ export function Home() {
       <section className="section container">
         <SectionHead
           eyebrow="เริ่มต้นตรงนี้"
-          title="บริการที่ใช้บ่อย"
+          title="บริการที่แนะนำ"
           link="/services"
         />
         <div className="service-grid">
@@ -157,7 +162,7 @@ export function Services() {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="ค้นหาวิธีใช้งาน เช่น เรียกรถ"
+          placeholder="ค้นหาบริการ เช่น เรียกรถ"
         />
       </label>
       <div className="chips" aria-label="กรองตามหมวดหมู่">
@@ -166,12 +171,15 @@ export function Services() {
             className={cat === c ? "active" : ""}
             onClick={() => setCat(c)}
             key={c}
+            aria-pressed={cat === c}
           >
             {c}
           </button>
         ))}
       </div>
-      <p className="result-count">พบ {found.length} บริการ</p>
+      <p className="result-count" role="status" aria-live="polite">
+        พบ {found.length} บริการ
+      </p>
       <div className="service-grid">
         {found.map((s) => (
           <ServiceCard key={s.id} service={s} />
@@ -198,7 +206,7 @@ export function ServiceDetail({ favorites, toggleFavorite }) {
     );
   const I = s.Icon;
   return (
-    <div className="container page">
+    <div className="container page service-detail-page">
       <Link className="back" to="/services">
         <ArrowLeft /> กลับไปหน้าบริการ
       </Link>
@@ -232,6 +240,11 @@ export function Tutorial({ favorites, toggleFavorite }) {
   const s = services.find((x) => x.id === serviceId),
     g = s?.guides.find((x) => x.id === guideId);
   const [i, setI] = useState(0);
+  const [completed, setCompleted] = useState(false);
+  useEffect(() => {
+    setI(0);
+    setCompleted(false);
+  }, [serviceId, guideId]);
   if (!g) return null;
   const step = g.steps[i],
     fid = serviceId + "-" + guideId;
@@ -252,6 +265,47 @@ export function Tutorial({ favorites, toggleFavorite }) {
         </button>
       </div>
       <article className="tutorial-card">
+        {completed ? (
+          <div className="tutorial-complete" aria-live="polite">
+            <span className="completion-icon" aria-hidden="true">
+              <CheckCircle2 />
+            </span>
+            <p className="eyebrow">เรียนรู้ครบแล้ว</p>
+            <h1>เก่งมากครับ คุณทำครบทุกขั้นตอนแล้ว</h1>
+            <p>
+              คุณเรียนรู้ “{g.title}” ครบแล้ว สามารถกลับไปเลือกคู่มืออื่น
+              หรือทบทวนอีกครั้งได้ทุกเมื่อ
+            </p>
+            <div className="completion-actions">
+              <Link className="btn primary" to={"/services/" + serviceId}>
+                กลับไปหน้าบริการ
+              </Link>
+              <button
+                className="btn secondary"
+                onClick={() => {
+                  setI(0);
+                  setCompleted(false);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+              >
+                เรียนอีกครั้ง
+              </button>
+              <button
+                className={
+                  "icon-label " + (favorites.includes(fid) ? "saved" : "")
+                }
+                onClick={() => toggleFavorite(fid)}
+                aria-pressed={favorites.includes(fid)}
+              >
+                <Heart />
+                {favorites.includes(fid)
+                  ? "อยู่ในรายการโปรด"
+                  : "เก็บไว้ในรายการโปรด"}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <>
         <div className="progress-head">
           <span>
             ขั้นตอนที่ <strong>{i + 1}</strong> จาก {g.steps.length}
@@ -260,44 +314,21 @@ export function Tutorial({ favorites, toggleFavorite }) {
         </div>
         <div
           className="progress"
+          role="progressbar"
+          aria-valuemin="1"
+          aria-valuemax={g.steps.length}
+          aria-valuenow={i + 1}
+          aria-valuetext={`ขั้นตอน ${i + 1} จาก ${g.steps.length}`}
           aria-label={`ขั้นตอน ${i + 1} จาก ${g.steps.length}`}
         >
           <span style={{ width: `${((i + 1) / g.steps.length) * 100}%` }} />
         </div>
-        <div
-          className={`step-visual${step.image ? " has-image" : ""}`}
-          style={{ "--accent": s.color }}
-        >
-          {step.image ? (
-            <figure className="tutorial-step-figure">
-              <a
-                className="tutorial-step-image-link"
-                href={step.image}
-                target="_blank"
-                rel="noreferrer"
-                aria-label={`เปิดภาพขนาดใหญ่: ${step.imageAlt}`}
-              >
-                <img
-                  className="tutorial-step-image"
-                  src={step.image}
-                  alt={step.imageAlt}
-                  loading="eager"
-                  decoding="async"
-                />
-              </a>
-              {step.imageCaption && (
-                <figcaption className="tutorial-step-caption">
-                  {step.imageCaption} · แตะภาพเพื่อดูขนาดใหญ่
-                </figcaption>
-              )}
-            </figure>
-          ) : (
-            <div className="mock-phone">
-              <span>{i + 1}</span>
-              <s.Icon />
-            </div>
-          )}
-        </div>
+        <TutorialMedia
+          step={step}
+          accent={s.color}
+          StepIcon={s.Icon}
+          stepNumber={i + 1}
+        />
         <div className="step-copy">
           <p className="eyebrow">{g.title}</p>
           <h1>{step.title}</h1>
@@ -324,11 +355,13 @@ export function Tutorial({ favorites, toggleFavorite }) {
               ขั้นตอนถัดไป <ArrowRight />
             </button>
           ) : (
-            <Link className="btn primary" to={"/services/" + serviceId}>
+            <button className="btn primary" onClick={() => setCompleted(true)}>
               เรียนจบแล้ว <CheckCircle2 />
-            </Link>
+            </button>
           )}
         </div>
+          </>
+        )}
       </article>
     </div>
   );

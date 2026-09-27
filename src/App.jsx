@@ -12,16 +12,32 @@ import {
   HowTo,
 } from "./pages";
 
+function readStoredValue(key, fallback) {
+  try {
+    const stored = localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 export default function App() {
-  const [favorites, setFavorites] = useState(() =>
-    JSON.parse(localStorage.getItem("elderlink-favorites") || "[]"),
-  );
-  const [settings, setSettings] = useState(() =>
-    JSON.parse(
-      localStorage.getItem("elderlink-settings") ||
-        '{"font":"normal","contrast":false}',
-    ),
-  );
+  const [favorites, setFavorites] = useState(() => {
+    const stored = readStoredValue("elderlink-favorites", []);
+    return Array.isArray(stored) ? stored : [];
+  });
+  const [settings, setSettings] = useState(() => {
+    const stored = readStoredValue("elderlink-settings", {
+      font: "normal",
+      contrast: false,
+    });
+    return {
+      font: ["normal", "large", "xlarge"].includes(stored?.font)
+        ? stored.font
+        : "normal",
+      contrast: Boolean(stored?.contrast),
+    };
+  });
   const [toast, setToast] = useState("");
   const location = useLocation();
   useEffect(() => {
@@ -36,7 +52,7 @@ export default function App() {
   }, [settings]);
   useEffect(() => {
     window.scrollTo(0, 0);
-    speechSynthesis?.cancel();
+    window.speechSynthesis?.cancel();
   }, [location.pathname]);
   const toggleFavorite = (id) => {
     setFavorites((x) =>

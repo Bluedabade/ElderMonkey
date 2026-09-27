@@ -40,6 +40,9 @@ body {
   background: var(--bg);
   line-height: 1.65;
 }
+body.dialog-open {
+  overflow: hidden;
+}
 img,
 svg {
   max-width: 100%;
@@ -552,6 +555,15 @@ h3 {
   gap: 14px;
   max-width: 880px;
 }
+.service-detail-page .service-hero,
+.service-detail-page .section-head,
+.service-detail-page .guide-list {
+  width: 100%;
+  max-width: none;
+}
+.service-detail-page .guide-card {
+  width: 100%;
+}
 .guide-card {
   background: white;
   border: 2px solid var(--line);
@@ -634,7 +646,7 @@ h3 {
   place-items: center;
   margin-top: 24px;
 }
-.step-visual.has-image {
+.step-visual.has-media {
   height: auto;
   min-height: 0;
   padding: 24px;
@@ -652,7 +664,8 @@ h3 {
   max-width: 100%;
   border-radius: 18px;
 }
-.tutorial-step-image {
+.tutorial-step-image,
+.tutorial-step-video {
   display: block;
   width: auto;
   max-width: 100%;
@@ -662,6 +675,10 @@ h3 {
   border: 1px solid var(--line);
   border-radius: 18px;
   box-shadow: 0 8px 24px rgba(24, 53, 82, 0.12);
+}
+.tutorial-step-video {
+  width: auto;
+  background: #0d1b2a;
 }
 .tutorial-step-caption {
   color: var(--muted);
@@ -736,6 +753,36 @@ h3 {
   justify-content: space-between;
   padding: 22px 34px;
   border-top: 1px solid var(--line);
+}
+.tutorial-complete {
+  padding: 56px 34px;
+  text-align: center;
+}
+.completion-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #eaf8f1;
+  color: #126747;
+}
+.completion-icon svg {
+  width: 44px;
+  height: 44px;
+}
+.tutorial-complete > p:not(.eyebrow) {
+  max-width: 620px;
+  margin: 0 auto 28px;
+  color: var(--muted);
+  font-size: 1.12rem;
+}
+.completion-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
 }
 .emergency-list {
   display: grid;
@@ -1128,11 +1175,12 @@ html[data-contrast="on"] .guide-card {
   .step-visual {
     height: 215px;
   }
-  .step-visual.has-image {
+  .step-visual.has-media {
     height: auto;
     padding: 16px;
   }
-  .tutorial-step-image {
+  .tutorial-step-image,
+  .tutorial-step-video {
     max-height: clamp(360px, 62dvh, 560px);
   }
   .step-copy {
@@ -1151,6 +1199,16 @@ html[data-contrast="on"] .guide-card {
   }
   .tutorial-nav .btn {
     padding-inline: 12px;
+    width: 100%;
+  }
+  .tutorial-complete {
+    padding: 44px 20px;
+  }
+  .completion-actions {
+    flex-direction: column;
+  }
+  .completion-actions .btn,
+  .completion-actions .icon-label {
     width: 100%;
   }
   .speech {
