@@ -264,11 +264,39 @@ export function Tutorial({ favorites, toggleFavorite }) {
         >
           <span style={{ width: `${((i + 1) / g.steps.length) * 100}%` }} />
         </div>
-        <div className="step-visual" style={{ "--accent": s.color }}>
-          <div className="mock-phone">
-            <span>{i + 1}</span>
-            <s.Icon />
-          </div>
+        <div
+          className={`step-visual${step.image ? " has-image" : ""}`}
+          style={{ "--accent": s.color }}
+        >
+          {step.image ? (
+            <figure className="tutorial-step-figure">
+              <a
+                className="tutorial-step-image-link"
+                href={step.image}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={`เปิดภาพขนาดใหญ่: ${step.imageAlt}`}
+              >
+                <img
+                  className="tutorial-step-image"
+                  src={step.image}
+                  alt={step.imageAlt}
+                  loading="eager"
+                  decoding="async"
+                />
+              </a>
+              {step.imageCaption && (
+                <figcaption className="tutorial-step-caption">
+                  {step.imageCaption} · แตะภาพเพื่อดูขนาดใหญ่
+                </figcaption>
+              )}
+            </figure>
+          ) : (
+            <div className="mock-phone">
+              <span>{i + 1}</span>
+              <s.Icon />
+            </div>
+          )}
         </div>
         <div className="step-copy">
           <p className="eyebrow">{g.title}</p>

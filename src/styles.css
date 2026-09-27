@@ -634,6 +634,41 @@ h3 {
   place-items: center;
   margin-top: 24px;
 }
+.step-visual.has-image {
+  height: auto;
+  min-height: 0;
+  padding: 24px;
+}
+.tutorial-step-figure {
+  width: 100%;
+  margin: 0;
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+}
+.tutorial-step-image-link {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  border-radius: 18px;
+}
+.tutorial-step-image {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  max-height: clamp(420px, 62dvh, 680px);
+  height: auto;
+  object-fit: contain;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(24, 53, 82, 0.12);
+}
+.tutorial-step-caption {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  text-align: center;
+}
 .mock-phone {
   width: 130px;
   height: 205px;
@@ -1092,6 +1127,13 @@ html[data-contrast="on"] .guide-card {
   }
   .step-visual {
     height: 215px;
+  }
+  .step-visual.has-image {
+    height: auto;
+    padding: 16px;
+  }
+  .tutorial-step-image {
+    max-height: clamp(360px, 62dvh, 560px);
   }
   .step-copy {
     padding: 24px 20px var(--space-24);

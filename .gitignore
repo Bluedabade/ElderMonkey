@@ -32,3 +32,6 @@ Thumbs.db
 AGENTS.md
 CODEX.md
 .github/copilot-instructions.md
+
+# Unused source copies created during screenshot format conversion
+public/images/tutorials/lineman/*.png.jpg
